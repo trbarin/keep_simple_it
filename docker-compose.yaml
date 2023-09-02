@@ -1,0 +1,35 @@
+version: '3'
+
+services:
+  db:
+    container_name: desafio_keep_simple_it_db
+    image: mysql:8.0.34
+    environment:
+      MYSQL_ROOT_PASSWORD: keep_simple_it
+      MYSQL_DATABASE: desafio
+    ports:
+      - 3306:3306
+    volumes:
+      - ./db:/var/lib/mysql
+    restart: on-failure
+
+  backend:
+    depends_on:
+      - db
+    container_name: desafio_keep_simple_it_backend
+    image: maven:3.9.4-eclipse-temurin-11-alpine
+    entrypoint: mvn -f /home/app spring-boot:run
+    ports:
+      - 8080:8080
+    volumes:
+      - ./backend:/home/app
+    restart: on-failure
+
+  frontend:
+    depends_on:
+      - backend
+    container_name: desafio_keep_simple_it_frontend
+    build: ./frontend
+    ports:
+      - 4200:80
+    restart: on-failure
